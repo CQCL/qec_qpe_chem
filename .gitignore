@@ -1,0 +1,10 @@
+# Python files.
+*.egg-info
+*.pyc
+__pycache__/
+
+# Mac file system.
+.DS_Store
+
+# Data is tracked independently.
+/data*/
