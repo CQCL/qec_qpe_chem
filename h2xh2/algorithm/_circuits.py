@@ -45,7 +45,7 @@ def add_rz(
             PauliExpBox([Pauli.Z], angle),
             [qubit],
         )
-        
+
 
 def get_qpe_func(
     state: Circuit,
