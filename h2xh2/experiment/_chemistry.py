@@ -89,40 +89,6 @@ def _add_ctrlu_2(
     angle_z: float,
     angle_x: float,
 ) -> Callable[[int], Circuit]:
-    """Add Steane QEC for each Trotter step."""
-    for ii in range(k):
-        # circ.CRz(2 * cz * deltat, 0, 1)
-        circ.Rz(angle_z, 1)
-        circ.CX(0, 1)
-        circ.Rz(-angle_z, 1)
-        circ.CX(0, 1)
-        # circ.CRx(2 * cx * deltat, 0, 1)
-        circ.H(1)
-        circ.Rz(angle_x, 1)
-        circ.CX(0, 1)
-        circ.Rz(-angle_x, 1)
-        circ.CX(0, 1)
-        circ.H(1)
-        if ii + 1 >= k:
-            break
-        circ.add_barrier(circ.qubits)
-        steane.add_steane_x(circ, 0)
-        circ.add_barrier(circ.qubits)
-        steane.add_steane_z(circ, 0)
-        circ.add_barrier(circ.qubits)
-        steane.add_steane_x(circ, 1)
-        circ.add_barrier(circ.qubits)
-        steane.add_steane_z(circ, 1)
-        circ.add_barrier(circ.qubits)
-    return circ
-
-
-def _add_ctrlu_3(
-    circ: Circuit,
-    k: int,
-    angle_z: float,
-    angle_x: float,
-) -> Callable[[int], Circuit]:
     """Add Steane QEC for each Trotter step and QEC_X in the middle."""
     for ii in range(k):
         # circ.CRz(2 * cz * deltat, 0, 1)
@@ -193,60 +159,8 @@ def get_ctrl_func(
                 _add_ctrlu_1(circ, k, angle_z, angle_x)
             case 2:
                 _add_ctrlu_2(circ, k, angle_z, angle_x)
-            case 3:
-                _add_ctrlu_3(circ, k, angle_z, angle_x)
             case _:
                 raise ValueError("qec_level")
-        # for ii in range(k):
-        #     # circ.CRz(2 * cz * deltat, 0, 1)
-        #     circ.Rz(angle_z, 1)
-        #     if qec_level > 1:
-        #         circ.add_barrier(circ.qubits)
-        #         steane.add_x_dd(circ, 0)
-        #         circ.add_barrier(circ.qubits)
-        #         circ.CX(0, 1)
-        #         circ.Rz(angle_z, 1)
-        #     else:
-        #         circ.CX(0, 1)
-        #         circ.Rz(-angle_z, 1)
-        #     circ.CX(0, 1)
-        #     # Spin echo.
-        #     circ.add_barrier(circ.qubits)
-        #     steane.add_x_dd(circ, 0)
-        #     circ.add_barrier(circ.qubits)
-        #     if qec_level > 1:
-        #         steane.add_steane_x(circ, 0)
-        #         circ.add_barrier(circ.qubits)
-        #     # circ.CRx(2 * cx * deltat, 0, 1)
-        #     circ.H(1)
-        #     circ.Rz(angle_x, 1)
-        #     if qec_level > 1:
-        #         circ.add_barrier(circ.qubits)
-        #         steane.add_x_dd(circ, 0)
-        #         circ.add_barrier(circ.qubits)
-        #         circ.CX(0, 1)
-        #         circ.Rz(angle_x, 1)
-        #     else:
-        #         circ.CX(0, 1)
-        #         circ.Rz(-angle_x, 1)
-        #     circ.CX(0, 1)
-        #     circ.H(1)
-        #     # Spin echo.
-        #     circ.add_barrier(circ.qubits)
-        #     steane.add_x_dd(circ, 0)
-        #     circ.add_barrier(circ.qubits)
-        #     if (ii + 1) == k:
-        #         break
-        #     if qec_level > 0:
-        #         steane.add_steane_x(circ, 0)
-        #         circ.add_barrier(circ.qubits)
-        #     if qec_level > 1:
-        #         steane.add_steane_z(circ, 0)
-        #         circ.add_barrier(circ.qubits)
-        #         steane.add_steane_x(circ, 1)
-        #         circ.add_barrier(circ.qubits)
-        #         steane.add_steane_z(circ, 1)
-        #         circ.add_barrier(circ.qubits)
         if benchmark:
             phase_factor = _chem_data.CI - _chem_data.APPROX_ENERGY
         else:
