@@ -6,5 +6,6 @@ __pycache__/
 # Mac file system.
 .DS_Store
 
-# Data is tracked independently.
-/data*/
+# Figure to be generated.
+*.pdf
+*.txt
