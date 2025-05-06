@@ -2,6 +2,7 @@
 *.egg-info
 *.pyc
 __pycache__/
+.venv
 
 # Mac file system.
 .DS_Store
