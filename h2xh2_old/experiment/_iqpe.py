@@ -5,7 +5,7 @@ from typing import (
 import numpy as np
 from pytket.circuit import Circuit
 from pytket.backends.backendresult import BackendResult
-from ..encode import EncodeOptions, InterpretOptions
+from ..encode import steane
 from ..algorithm import (
     get_qpe_func,
     get_ms,
@@ -19,10 +19,10 @@ from ._chemistry import (
 class IqpeInput(NamedTuple):
     k_list: list[int]
     beta_list: list[int]
-    encode: Callable[[Circuit, EncodeOptions | None], Circuit]
-    interpret: Callable[[BackendResult, InterpretOptions | None], BackendResult]
-    encode_options: EncodeOptions | None = None
-    intepret_options: InterpretOptions | None = None
+    encode: Callable[[Circuit, steane.EncodeOptions | None], Circuit]
+    interpret: Callable[[BackendResult, steane.InterpretOptions | None], BackendResult]
+    encode_options: steane.EncodeOptions | None = None
+    intepret_options: steane.InterpretOptions | None = None
     qec_level: int = 0
     pft_rz: bool = False
 

@@ -5,7 +5,7 @@ from typing import (
 from pytket.circuit import Circuit
 from pytket.passes import RemoveBarriers
 from pytket.backends.backendresult import BackendResult
-from h2xh2.encode import EncodeOptions, InterpretOptions
+from h2xh2.encode import steane
 from ._chemistry import (
     get_state,
     get_ctrl_func,
@@ -15,10 +15,10 @@ from ..algorithm import get_qpe_func
 
 class BenchmarkInput(NamedTuple):
     k_list: list[int]
-    encode: Callable[[Circuit, EncodeOptions | None], Circuit]
-    interpret: Callable[[BackendResult, InterpretOptions | None], BackendResult]
-    encode_options: EncodeOptions | None = None
-    intepret_options: InterpretOptions | None = None
+    encode: Callable[[Circuit, steane.EncodeOptions | None], Circuit]
+    interpret: Callable[[BackendResult, steane.InterpretOptions | None], BackendResult]
+    encode_options: steane.EncodeOptions | None = None
+    intepret_options: steane.InterpretOptions | None = None
     qec_level: int = 0
     pft_rz: bool = False
 

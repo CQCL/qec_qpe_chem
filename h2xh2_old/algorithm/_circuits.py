@@ -47,66 +47,6 @@ def add_rz(
         )
 
 
-def get_qpde_func(
-    state: Circuit,
-    ctrl_ext: Circuit,
-    get_u: Callable[[int], Circuit],
-    n_rounds: int = 1,
-) -> Callable[[int, float], Circuit]:
-    """Return a function to build Sugisaki's QPDE circuit.
-
-    Reference: K. Sugisaki, et al., Phys. Chem. Chem. Phys. 23, 20152 (2021).
-
-    Args:
-        state: State preparation circuit.
-        ctrl_ext: Controlled excitation circuit.
-        get_u: A function to return a circuit representing the unitary.
-        n_rounds: Number of rounds (ancilla qubits) for canonical implemenation.
-
-    Returns:
-        A function to build QPDE circuit.
-    """
-
-    def get_circuit(k: int, beta: float) -> Circuit:
-        """Build a QPDE circuit.
-
-        Args:
-            k: Number of reeats of the unitary.
-            beta: Rotation angle before the X measurement.
-        """
-        # Set quantum/classical registers.
-        circ = Circuit(state.n_qubits + n_rounds, n_rounds)
-        system_register = circ.qubits[-state.n_qubits :]
-        ancilla_register = circ.qubits[:n_rounds]
-        classical_register = circ.bits
-        # Now build the circuit.
-        circ.add_circuit(state, system_register)
-        for j, q in enumerate(ancilla_register[::-1]):
-            circ.H(q)
-            current_register = [q] + system_register
-            multiple = 2**j
-            circ.add_circuit(ctrl_ext, current_register)
-            u = get_u(multiple * k)
-            if u.n_qubits == state.n_qubits:
-                circ.add_circuit(u, system_register)
-            elif u.n_qubits == ctrl_ext.n_qubits:
-                circ.add_circuit(u, current_register)
-            else:
-                raise RuntimeError()
-            circ.add_circuit(ctrl_ext.dagger(), current_register)
-            # if abs(multiple * beta) > 0:
-            #     circ.Rz(multiple * beta, q)
-            add_rz(circ, q, multiple * beta)
-        iqft_circ = iqft(n_rounds)
-        circ.add_circuit(iqft_circ, ancilla_register)
-        # Add measurement.
-        for q, c in zip(ancilla_register, classical_register):
-            circ.Measure(q, c)
-        return circ
-
-    return get_circuit
-
-
 def get_qpe_func(
     state: Circuit,
     get_ctrlu: Callable[[int], Circuit],
@@ -183,12 +123,3 @@ def qft(n_qubits: int) -> Circuit:
     circuit = Circuit(n_qubits, name="QFT")
     circuit.add_circuit(iqft(n_qubits=n_qubits).dagger(), circuit.qubits)
     return circuit
-
-
-if __name__ == "__main__":
-    from pytket.circuit.display import render_circuit_jupyter as draw
-
-    for a in (0, 0.5, 1.0, 1.5, 0.15):
-        circ = Circuit(1)
-        add_rz(circ, 0, a)
-        draw(circ)

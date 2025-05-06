@@ -3,12 +3,8 @@
 This module contains all the scripts to reproduce the experiments in the paper (#LINK).
 """
 
-from ._cmdutils import BackendInput
-
-
 __all__ = [
     "algorithm",
     "encode",
     "experiment",
-    "BackendInput",
 ]

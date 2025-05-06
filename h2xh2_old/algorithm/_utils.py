@@ -1,3 +1,4 @@
+# %%
 """QPE utility collection."""
 
 from typing import (
@@ -24,26 +25,19 @@ def counts_to_lists(
 
 
 def get_mu_and_sigma(
-    phi: np.ndarray,
     prior: np.ndarray,
+    phi: np.ndarray | None = None,
 ) -> tuple[float, float]:
-    """Calculate the mean mu and standard deviation sigma.
-
-    Notes:
-        This is the ad-hoc implementation not concerning periodicity.
-        If the distribution is not localized, the results may not be accurate.
-    """
+    """Calculate the circular mean mu and square of Holevo variance sigma."""
+    if phi is None:
+        phi = np.linspace(0, 2, len(prior) + 1)[:-1]
     dphi = 2 / len(phi)
-    mu = np.sum(np.array(prior) * phi) * dphi
-    sigma = np.sqrt(np.sum(prior * (phi - mu) ** 2) * dphi)
-    l = len(phi) // 2
-    phi1 = np.copy(phi)
-    phi1[:l] += 2.0
-    mu1 = np.sum(prior * phi1) * dphi
-    sigma1 = np.sqrt(np.sum(prior * (phi1 - mu) ** 2) * dphi)
-    if sigma1 < sigma:
-        mu = mu1
-        sigma = sigma1
+    # Circular mean.
+    mu = np.angle(np.sum(np.exp(1.0j * np.pi * phi) * prior) * dphi * np.pi)
+    mu /= np.pi
+    # Holevo variance sigma^2.
+    sigma2 = np.abs(np.sum(np.exp(1.0j * np.pi * phi) * prior) * dphi) ** -2 - 1
+    sigma = np.sqrt(sigma2) / np.pi
     return mu, sigma
 
 
@@ -73,7 +67,8 @@ def noise_aware_likelihood(
     beta: float,
     m: int,
     phi: Union[float, list],
-    error_rate: Optional[Callable[[int], float]] = None,
+    error_rate: Callable[[int], float] | None = None,
+    phase_shift: Callable[[int], float] | None = None,
 ) -> Union[float, list]:
     """Likelihood function for the noiseless simulation.
 
@@ -95,8 +90,42 @@ def noise_aware_likelihood(
     q = 0.0
     if error_rate is not None:
         q = error_rate(k)
+    omega = 0.0
+    if phase_shift is not None:
+        omega = phase_shift(k)
     phi = np.array(phi)
-    val = 1 + (1 - q) * (-1) ** m * np.cos(np.pi * (k * phi + beta))
+    val = 1 + (1 - q) * (-1) ** m * np.cos(np.pi * (k * phi + beta - omega))
     val *= 0.5
     val = val.tolist()
     return val
+
+
+def get_mock_backend(
+    phis: list[float],
+    amps: list[float],
+    error_rate: Optional[Callable[[int], float]] = None,
+    phase_shift: Optional[Callable[[int], float]] = None,
+) -> Callable[[int, float], int]:
+    """Return a mock backend function."""
+
+    def mock_backend(k: int, beta: float) -> int:
+        """Mock backend."""
+        p0 = 0.0
+        for phi, amp in zip(phis, amps):
+            # Probability to measure 0.
+            p0t = noise_aware_likelihood(
+                k,
+                beta,
+                0,
+                phi,
+                error_rate=error_rate,
+                phase_shift=phase_shift,
+            )
+            p0 += amp * p0t
+        # Draw the measurement outcome m.
+        m = 0
+        if np.random.random() > p0:
+            m = 1
+        return m
+
+    return mock_backend
