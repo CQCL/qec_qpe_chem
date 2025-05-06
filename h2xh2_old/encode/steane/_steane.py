@@ -59,9 +59,7 @@ class RzMode(Enum):
         Indirect (gate teleportation) and deterministic operation with the angle in binary fraction (non-FT).
     BIN_FRAC_MEAS_FT:
         Indirect (gate teleportation) and deterministic operation with the angle in binary fraction (MEAS-FT).
-    BIN_FRAC_SPAM_FT:
-        Indirect (gate teleportation) and deterministic operation with the angle in binary fraction (SPAM-FT).
-    BIN_FRAC_PART_FT:
+    BBIN_FRAC_PART_FT:
         Indirect (gate teleportation) and deterministic operation with the angle in binary fraction (partially FT).
     BIN_FRAC_PART_FT_GOTO:
         Indirect (gate teleportation) and deterministic operation with the angle in binary fraction (partially FT with Goto's state prep).

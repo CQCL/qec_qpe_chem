@@ -1,5 +1,7 @@
 from pytket.circuit import Circuit, Bit, Qubit, OpType
 from typing import List
+from .rz_encoding import RzDirect
+from .iceberg_detections import iceberg_detect_zx
 
 
 def get_non_ft_prep(data_qubits: List[Qubit]) -> Circuit:
@@ -78,3 +80,49 @@ def get_non_ft_rz_plus_prep(phase: float, data_qubits: List[Qubit]) -> Circuit:
     for q in data_qubits:
         c.H(q)
     return c
+
+
+def get_prep_rz_part_ft_goto(phase: float, data_qubits: List[Qubit], ancilla_qubits: List[Qubit], syndrome_bits: List[Bit], flag_bit: Bit, n_rus: int) -> Circuit:
+    c: Circuit = Circuit()
+    assert len(data_qubits) == 7
+    assert len(ancilla_qubits) == 2
+    assert len(syndrome_bits) == 5
+
+    discard_bits: List[Bit] = [Bit("discard", 0), Bit("discard", 1)]
+    for q in data_qubits + ancilla_qubits:
+        c.add_qubit(q)
+
+    for b in syndrome_bits + [flag_bit] + discard_bits:
+        c.add_bit(b)
+
+    
+    # FT |+> state prep
+    c.append(get_ft_prep(data_qubits, ancilla_qubits[0], syndrome_bits[0]))
+    for q in data_qubits:
+        c.H(q)
+
+    # non FT zero
+    c.append(RzDirect.get_circuit(phase, data_qubits))
+
+    # detect errors with Iceberg gadget
+    c.append(iceberg_detect_zx(0, data_qubits, ancilla_qubits, syndrome_bits[1:3], discard_bits[0]))
+    c.append(iceberg_detect_zx(1, data_qubits, ancilla_qubits, syndrome_bits[3:5], discard_bits[1]))
+    c.add_clexpr(
+        WiredClExpr(
+            expr=ClExpr(op=ClOp.BitOr, args=[ClBitVar(i) for i in range(2)]),
+            bit_posn = {i:i for i in range(2)},
+            output_posn = [3]
+        ),
+        discard_bits + [flag_bit],
+    )
+    goto_c: Circuit = c.copy()
+    # repeat construction while flag_bit is false, i.e. while iceberg detection finds errors
+    for _ in range(n_rus - 1):
+        c.add_circbox(
+            CircBox(goto_c),
+            goto_c.qubits + goto_c.bits,
+            condition = flag_bit
+        )  
+    return c
+
+    

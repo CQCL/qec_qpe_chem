@@ -31,12 +31,17 @@ class RzMode(Enum):
         Indirect (gate teleportation) and deterministic operation with the angle in binary fraction (non-FT).
     BIN_FRAC_MEAS_FT:
         Indirect (gate teleportation) and deterministic operation with the angle in binary fraction (MEAS-FT).
+    BBIN_FRAC_PART_FT:
+        Indirect (gate teleportation) and deterministic operation with the angle in binary fraction (partially FT).
+    BIN_FRAC_PART_FT_GOTO:
+        Indirect (gate teleportation) and deterministic operation with the angle in binary fraction (partially FT with Goto's state prep).
     """
 
     DIRECT = "direct"
     BIN_FRAC_NON_FT = "bin_frac_non_ft"
     BIN_FRAC_MEAS_FT = "bin_frac_meas_ft"
     BIN_FRAC_PART_FT = "bin_frac_part_ft"
+    BIN_FRAC_PART_FT_GOTO = "bin_frac_part_ft_goto"
 
 
 class RzOptionsRUS(NamedTuple):
@@ -73,20 +78,18 @@ class RzOptionsBinFracMeasFT(NamedTuple):
 
 
 class RzOptionsBinFracPartFT(NamedTuple):
-    """Options for the RzMode.BIN_FRAC_PART_FT.
+    """Options for the RzMode.BIN_FRAC_PART_FT and 
+    RzMode.BIN_FRAC_PART_FT_GOTO.
 
     Args:
         max_bits:
             Maximum number of bits (i.e., max_bits - 2 = max_rus)
         n_rus:
             Number of RUS if PFT implementation is used.
-        detect_type:
-            Error detection type
     """
 
     max_bits: int = 10
     n_rus: int = 1
-    detect_type: list[str] = ["W", "Z"]
 
 
 class EncodeData(NamedTuple):
@@ -408,6 +411,12 @@ def get_encoded_circuit(
                                 part_ft_syndrome_bits,
                                 flag_bit,
                                 condition_bit,
+                            )
+                        )
+                    case RzMode.BIN_FRAC_PART_FT_GOTO:
+                        encoded_circuit.append(
+                            RzPartFtgoto(rz_options.max_bits).get_circuit(
+                                ...
                             )
                         )
                     case _:

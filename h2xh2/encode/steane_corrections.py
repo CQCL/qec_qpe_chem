@@ -1,5 +1,5 @@
 from pytket import Qubit, Bit, Circuit
-from pytket.circuit import CircBox, BitRegister
+from pytket.circuit import ClBitVar, ClExpr, ClOp, WiredClExpr, BitRegister
 from pytket.passes import DecomposeBoxes
 from typing import Dict, List, Tuple
 from .state_prep import get_non_ft_prep, get_ft_prep
@@ -20,23 +20,29 @@ def classical_steane_decoding(
     for b in ancilla_bits:
         c.add_bit(b)
 
-    c.add_classicalexpbox_bit(
-        reduce(
-            xor, [ancilla_bits[0], ancilla_bits[1], ancilla_bits[2], ancilla_bits[3]]
+    c.add_clexpr(
+        WiredClExpr(
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(4)]),
+            bit_posn={i:i for i in range(4)},
+            output_posn=[4],
         ),
-        [syndrome_bits[0]],
+        [ancilla_bits[0], ancilla_bits[1], ancilla_bits[2], ancilla_bits[3], syndrome_bits[0]]
     )
-    c.add_classicalexpbox_bit(
-        reduce(
-            xor, [ancilla_bits[1], ancilla_bits[2], ancilla_bits[4], ancilla_bits[5]]
+    c.add_clexpr(
+        WiredClExpr(
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(4)]),
+            bit_posn={i:i for i in range(4)},
+            output_posn=[4],
         ),
-        [syndrome_bits[1]],
+        [ancilla_bits[1], ancilla_bits[2], ancilla_bits[4], ancilla_bits[5], syndrome_bits[1]]
     )
-    c.add_classicalexpbox_bit(
-        reduce(
-            xor, [ancilla_bits[2], ancilla_bits[3], ancilla_bits[5], ancilla_bits[6]]
+    c.add_clexpr(
+        WiredClExpr(
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(4)]),
+            bit_posn={i:i for i in range(4)},
+            output_posn=[4],
         ),
-        [syndrome_bits[2]],
+        [ancilla_bits[2], ancilla_bits[3], ancilla_bits[5], ancilla_bits[6], syndrome_bits[2]]
     )
     return c
 

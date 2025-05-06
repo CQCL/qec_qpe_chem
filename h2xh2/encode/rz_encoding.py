@@ -6,7 +6,7 @@ from pytket import Bit, Circuit, Qubit
 from pytket.circuit import CircBox, ClBitVar, ClExpr, ClOp, WiredClExpr
 from typing import List
 
-from .state_prep import get_non_ft_rz_plus_prep, get_ft_prep, get_non_ft_prep
+from .state_prep import get_non_ft_rz_plus_prep, get_ft_prep, get_non_ft_prep, get_prep_rz_part_ft_goto
 from .basic_gates import get_S, get_Z, get_Sdg, get_H, get_CX
 from .iceberg_detections import iceberg_detect_z, iceberg_detect_zx
 
@@ -784,6 +784,56 @@ class RzKNonFt(RzEncoding):
             ),
         )
         return c
+
+
+
+class RzPartFtgoto(RzEncoding):
+    def __init__(self, _max_rus: int):
+        self.max_rus_ = _max_rus
+
+    def get_circuit(
+        self,
+        phase: float,
+        data_qubits: List[Qubit],
+        ancilla_qubits: List[Qubit],
+        ancilla_bits: List[Bit],
+        syndrome_bits: List[Bit],
+        flag_bit: Bit
+    ) -> Circuit:
+        assert len(data_qubits) == 7    
+        assert len(ancilla_qubits) == 9
+        assert len(ancilla_bits) == 7
+        assert len(syndrome_bits) == 4
+
+        binary_expansion: List[Bit] = RzKNonFt.resolve_phase(phase, self.max_bits_)
+        # skim binary expansion to remove last n zero terms
+        while binary_expansion[-1] == False:
+            assert binary_expansion.pop() == False
+
+        c = Circuit()
+        for q in data_qubits + ancilla_qubits:
+            c.add_qubit(q)
+        c.add_barrier(data_qubits + ancilla_qubits)
+
+        c.append(get_prep_rz_part_ft_goto(phase, ancilla_qubits[:7], ancilla_qubits[7:9]), syndrome_bits, flag_bit, self.max_rus_)
+
+        # teleport
+        c.append(get_CX(data_qubits, ancilla_qubits[:7]))
+        c.append(get_Measure(ancilla_qubits[:7], ancilla_bits))
+
+        # check for errors
+        # first write output parity
+        c.add_clexpr(
+            WiredClExpr(
+                expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(7)]),
+                bit_posn={i: i for i in range(7)},
+                output_posn = [7],
+            )
+            ancilla_bits + [syndrome_bits[3]]
+        )
+        c.
+
+
 
 
 class RzKMeasFt(RzKNonFt):
