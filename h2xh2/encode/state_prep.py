@@ -1,6 +1,5 @@
 from pytket.circuit import Circuit, Bit, Qubit, OpType
 from typing import List
-from .rz_encoding import RzDirect
 from .iceberg_detections import iceberg_detect_zx
 
 
@@ -102,7 +101,10 @@ def get_prep_rz_part_ft_goto(phase: float, data_qubits: List[Qubit], ancilla_qub
         c.H(q)
 
     # non FT zero
-    c.append(RzDirect.get_circuit(phase, data_qubits))
+    c.CX(data_qubits[5], data_qubits[3])
+    c.ZZPhase(phase, data_qubits[3], data_qubits[1])
+    c.CX(data_qubits[5], data_qubits[3])
+
 
     # detect errors with Iceberg gadget
     c.append(iceberg_detect_zx(0, data_qubits, ancilla_qubits, syndrome_bits[1:3], discard_bits[0]))
@@ -111,7 +113,7 @@ def get_prep_rz_part_ft_goto(phase: float, data_qubits: List[Qubit], ancilla_qub
         WiredClExpr(
             expr=ClExpr(op=ClOp.BitOr, args=[ClBitVar(i) for i in range(2)]),
             bit_posn = {i:i for i in range(2)},
-            output_posn = [3]
+            output_posn = [2]
         ),
         discard_bits + [flag_bit],
     )

@@ -1,5 +1,5 @@
 from pytket import Qubit, Bit, Circuit
-from pytket.circuit import ClBitVar, ClExpr, ClOp, WiredClExpr, BitRegister
+from pytket.circuit import ClBitVar, ClExpr, ClOp, WiredClExpr, BitRegister, CircBox
 from pytket.passes import DecomposeBoxes
 from typing import Dict, List, Tuple
 from .state_prep import get_non_ft_prep, get_ft_prep
@@ -17,32 +17,83 @@ def classical_steane_decoding(
     assert len(syndrome_bits) == 3
     c: Circuit = Circuit()
     c.add_c_register(syndrome_bits.name, syndrome_bits.size)
-    for b in ancilla_bits:
+    scratch_bits: List[Bit] = [Bit("scratch", i) for i in range(2)]     
+    for b in ancilla_bits + scratch_bits:
         c.add_bit(b)
 
     c.add_clexpr(
         WiredClExpr(
-            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(4)]),
-            bit_posn={i:i for i in range(4)},
-            output_posn=[4],
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
+            bit_posn={i: i for i in range(2)},
+            output_posn=[2],
         ),
-        [ancilla_bits[0], ancilla_bits[1], ancilla_bits[2], ancilla_bits[3], syndrome_bits[0]]
+        [ancilla_bits[0], ancilla_bits[1], scratch_bits[0]],
     )
     c.add_clexpr(
         WiredClExpr(
-            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(4)]),
-            bit_posn={i:i for i in range(4)},
-            output_posn=[4],
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
+            bit_posn={i: i for i in range(2)},
+            output_posn=[2],
         ),
-        [ancilla_bits[1], ancilla_bits[2], ancilla_bits[4], ancilla_bits[5], syndrome_bits[1]]
+        [ancilla_bits[2], scratch_bits[0], scratch_bits[1]],
     )
     c.add_clexpr(
         WiredClExpr(
-            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(4)]),
-            bit_posn={i:i for i in range(4)},
-            output_posn=[4],
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
+            bit_posn={i: i for i in range(2)},
+            output_posn=[2],
         ),
-        [ancilla_bits[2], ancilla_bits[3], ancilla_bits[5], ancilla_bits[6], syndrome_bits[2]]
+        [ancilla_bits[3], scratch_bits[1], syndrome_bits[0]],
+    )
+
+    c.add_clexpr(
+        WiredClExpr(
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
+            bit_posn={i: i for i in range(2)},
+            output_posn=[2],
+        ),
+        [ancilla_bits[1], ancilla_bits[2], scratch_bits[0]],
+    )
+    c.add_clexpr(
+        WiredClExpr(
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
+            bit_posn={i: i for i in range(2)},
+            output_posn=[2],
+        ),
+        [ancilla_bits[4], scratch_bits[0], scratch_bits[1]],
+    )
+    c.add_clexpr(
+        WiredClExpr(
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
+            bit_posn={i: i for i in range(2)},
+            output_posn=[2],
+        ),
+        [ancilla_bits[5], scratch_bits[1], syndrome_bits[1]],
+    )
+
+    c.add_clexpr(
+        WiredClExpr(
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
+            bit_posn={i: i for i in range(2)},
+            output_posn=[2],
+        ),
+        [ancilla_bits[2], ancilla_bits[3], scratch_bits[0]],
+    )
+    c.add_clexpr(
+        WiredClExpr(
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
+            bit_posn={i: i for i in range(2)},
+            output_posn=[2],
+        ),
+        [ancilla_bits[5], scratch_bits[0], scratch_bits[1]],
+    )
+    c.add_clexpr(
+        WiredClExpr(
+            expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
+            bit_posn={i: i for i in range(2)},
+            output_posn=[2],
+        ),
+        [ancilla_bits[6], scratch_bits[1], syndrome_bits[2]],
     )
     return c
 
