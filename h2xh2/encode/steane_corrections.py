@@ -1,5 +1,5 @@
 from pytket import Qubit, Bit, Circuit
-from pytket.circuit import ClBitVar, ClExpr, ClOp, WiredClExpr, BitRegister, CircBox
+from pytket.circuit import ClBitVar, ClExpr, ClOp, WiredClExpr, CircBox
 from pytket.passes import DecomposeBoxes
 from typing import Dict, List, Tuple
 from .state_prep import get_non_ft_prep, get_ft_prep
@@ -11,14 +11,13 @@ from operator import xor
 
 def classical_steane_decoding(
     ancilla_bits: List[Bit],
-    syndrome_bits: BitRegister,
+    syndrome_bits: List[Bit],
 ) -> Circuit:
     assert len(ancilla_bits) == 7
     assert len(syndrome_bits) == 3
     c: Circuit = Circuit()
-    c.add_c_register(syndrome_bits.name, syndrome_bits.size)
     scratch_bits: List[Bit] = [Bit("scratch", i) for i in range(2)]     
-    for b in ancilla_bits + scratch_bits:
+    for b in ancilla_bits + syndrome_bits + scratch_bits:
         c.add_bit(b)
 
     c.add_clexpr(
@@ -114,7 +113,7 @@ def steane_z_correction(
     data_qubits: List[Qubit],
     ancilla_qubits: List[Qubit],
     ancilla_bits: List[Bit],
-    syndrome_bits: BitRegister,
+    syndrome_bits: List[Bit],
     goto_qubit: Qubit,
     goto_bit: Bit,
     register_bit: Bit,
@@ -128,7 +127,7 @@ def steane_z_correction(
     correction: Circuit = Circuit()
     for q in data_qubits + ancilla_qubits + [goto_qubit]:
         correction.add_qubit(q)
-    for b in ancilla_bits + syndrome_bits.to_list() + [goto_bit, register_bit]:
+    for b in ancilla_bits + syndrome_bits + [goto_bit, register_bit]:
         correction.add_bit(b)
 
     correction.add_barrier(data_qubits + ancilla_qubits + [goto_qubit])
@@ -184,7 +183,7 @@ def steane_x_correction(
     data_qubits: List[Qubit],
     ancilla_qubits: List[Qubit],
     ancilla_bits: List[Qubit],
-    syndrome_bits: BitRegister,
+    syndrome_bits: List[Bit],
     goto_qubit: Qubit,
     goto_bit: Bit,
     register_bit: Bit,
@@ -198,7 +197,7 @@ def steane_x_correction(
     correction: Circuit = Circuit()
     for q in data_qubits + ancilla_qubits + [goto_qubit]:
         correction.add_qubit(q)
-    for b in ancilla_bits + syndrome_bits.to_list() + [goto_bit, register_bit]:
+    for b in ancilla_bits + syndrome_bits + [goto_bit, register_bit]:
         correction.add_bit(b)
 
     correction.add_barrier(data_qubits + ancilla_qubits + [goto_qubit])

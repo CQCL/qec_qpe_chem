@@ -1,7 +1,3 @@
-"""
-To run these tests
-"""
-
 from h2xh2.encode import get_non_ft_prep, get_ft_prep
 from pytket import Bit, Circuit, Qubit
 from pytket.backends.backendresult import BackendResult
@@ -24,7 +20,6 @@ def test_non_ft_prep_identity() -> None:
     for bitstring in compile_and_run(c, 100).get_counts(cbits=bits):
         bs_set.add(bitstring)
         assert sum(bitstring) % 2 == 0
-    print(bs_set)
 
 
 def test_non_ft_prep_x() -> None:

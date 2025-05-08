@@ -1,4 +1,4 @@
-from pytket.circuit import Circuit, OpType, Qubit, Bit, BitRegister
+from pytket.circuit import Circuit, OpType, Qubit, Bit
 from typing import List, NamedTuple, Dict
 from enum import Enum
 from itertools import chain
@@ -187,6 +187,7 @@ def get_encoded_circuit(
     rz_ancilla_bits: List[Bit] = [Bit("rz_ancilla_b", i) for i in range(7)]
     rz_syndrome_bits: List[Bit] = [Bit("rz_syndrome_b", i) for i in range(3)]
     steane_ancilla_bits: List[Bit] = [Bit("steane_ancilla_b", i) for i in range(7)]
+    steane_syndrome_bits: List[Bit] = [Bit("steane_syndrome_b", i) for i in range(3)]
     iceberg_syndrome_bits: List[Bit] = [Bit("iceberg_syndrome_b", i) for i in range(2)]
     part_ft_syndrome_bits: List[Bit] = [Bit("part_ft_syndrome_b", i) for i in range(5)]
     iceberg_discard_bit: Bit = Bit("iceberg_discard_b", 0)
@@ -198,15 +199,13 @@ def get_encoded_circuit(
 
     # add suitable qubits/bits to some circuit
     encoded_circuit: Circuit = Circuit()
-    steane_syndrome_bits: BitRegister = encoded_circuit.add_c_register(
-        "steane_syndrome_b", 3
-    )
     for q in list(chain(*get_data_qubits.values())) + ancilla_qubits:
         encoded_circuit.add_qubit(q)
     for b in (
         rz_ancilla_bits
         + rz_syndrome_bits
         + steane_ancilla_bits
+        + steane_syndrome_bits
         + iceberg_syndrome_bits
         + [
             iceberg_discard_bit,

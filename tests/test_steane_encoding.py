@@ -9,7 +9,6 @@ from h2xh2.encode import (
     syndrome_from_readout,
 )
 from pytket import Bit, Circuit, Qubit
-from pytket.circuit import BitRegister
 from pytket.backends.backendresult import BackendResult
 from typing import List
 from itertools import product
@@ -18,7 +17,7 @@ from utils import compile_and_run
 
 def test_classical_steane_decoding() -> None:
     ancilla_bits: List[Bit] = [Bit("ancilla", i) for i in range(7)]
-    syndrome_bits: BitRegister = BitRegister("syndrome", 3)
+    syndrome_bits: List[Bit] = [Bit("syndrome", i) for i in range(3)]
 
     for syndrome in list(product(*[range(2)] * 3))[1:]:
         c: Circuit = Circuit(7)
@@ -36,7 +35,7 @@ def test_steane_z_correction() -> None:
     data_bits: List[Qubit] = [Bit("data_b", i) for i in range(7)]
     ancilla_qubits: List[Qubit] = [Qubit("ancilla_q", i) for i in range(7)]
     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
-    syndrome_bits: BitRegister = BitRegister("syndrome", 3)
+    syndrome_bits: List[Bit] = [Bit("syndrome", i) for i in range(3)]
     goto_qubit: Qubit = Qubit("goto_q", 0)
     goto_bit: Bit = Bit("goto_b", 0)
     register_bit: Bit = Bit("reg_b", 0)
@@ -62,7 +61,7 @@ def test_steane_z_correction() -> None:
         c.append(get_Measure(data_qubits, data_bits))
 
         r: BackendResult = compile_and_run(c, 10)
-        for k in r.get_counts(cbits=data_bits + syndrome_bits.to_list()):
+        for k in r.get_counts(cbits=data_bits + syndrome_bits):
             # check artifical error is detected
             assert sum(k[7:]) > 0
             # check artifical error has been corrected
@@ -75,7 +74,7 @@ def test_steane_x_correction() -> None:
     data_bits: List[Qubit] = [Bit("data_b", i) for i in range(7)]
     ancilla_qubits: List[Qubit] = [Qubit("ancilla_q", i) for i in range(7)]
     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
-    syndrome_bits: BitRegister = BitRegister("syndrome", 3)
+    syndrome_bits: List[Bit] = [Bit("syndrome", i) for i in range(3)]
     goto_qubit: Qubit = Qubit("goto_q", 0)
     goto_bit: Bit = Bit("goto_b", 0)
     register_bit: Bit = Bit("reg_b", 0)
@@ -101,7 +100,7 @@ def test_steane_x_correction() -> None:
         )
         c.append(get_Measure(data_qubits, data_bits))
         r: BackendResult = compile_and_run(c, 10)
-        for k in r.get_counts(cbits=data_bits + syndrome_bits.to_list()):
+        for k in r.get_counts(cbits=data_bits + syndrome_bits):
             # check artifical error is detected
             assert sum(k[7:]) > 0
             # check artifical error has been corrected
@@ -114,7 +113,7 @@ def test_steane_xz_correction() -> None:
     data_bits: List[Qubit] = [Bit("data_b", i) for i in range(7)]
     ancilla_qubits: List[Qubit] = [Qubit("ancilla_q", i) for i in range(7)]
     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
-    syndrome_bits: BitRegister = BitRegister("syndrome", 3)
+    syndrome_bits: List[Bit] = [Bit("syndrome", i) for i in range(3)]
     goto_qubit: Qubit = Qubit("goto_q", 0)
     goto_bit: Bit = Bit("goto_b", 0)
     register_bit: Bit = Bit("reg_b", 0)
@@ -153,7 +152,7 @@ def test_steane_xz_correction() -> None:
         )
         c.append(get_Measure(data_qubits, data_bits))
         r: BackendResult = compile_and_run(c, 5)
-        for k in r.get_counts(cbits=data_bits + syndrome_bits.to_list()):
+        for k in r.get_counts(cbits=data_bits + syndrome_bits):
             # check artifical error is detected
             assert sum(k[7:]) > 0
             # check artifical error has been corrected
