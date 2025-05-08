@@ -116,7 +116,3 @@ def test_iceberg_z0():
     )
     logical_result: BackendResult = get_decoded_result(compile_and_run(encoded, 10))
     assert list(logical_result.get_counts().keys()) == [(0,)]
-
-
-if __name__ == "__main__":
-    test_bin_frac_rz_peb()
