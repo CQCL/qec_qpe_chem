@@ -18,7 +18,7 @@ from .basic_gates import (
 
 from .steane_corrections import steane_z_correction, steane_x_correction
 from .iceberg_detections import iceberg_detect_x, iceberg_detect_z, iceberg_detect_zx
-from .rz_encoding import RzDirect, RzKNonFt, RzKMeasFt, RzPartFt, RzKPartFt
+from .rz_encoding import RzDirect, RzKNonFt, RzKMeasFt, RzKPartFt
 from .state_prep import get_non_ft_prep
 
 

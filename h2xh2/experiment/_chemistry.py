@@ -9,7 +9,6 @@ from pytket.circuit import (
     Pauli,
 )
 from ..encode import (
-    x_dynamical_decoupling,
     steane_z_correct,
     steane_x_correct,
     iceberg_w_0_detect,
@@ -231,6 +230,6 @@ def get_state(
             )
         if pft_rz:
             # Iceberg-style error detection.
-            circ.add_custom_gate(iceberg_w_0_detect, [], [0])
-            circ.add_custom_gate(iceberg_w_1_detect, [], [0])
+            state.add_custom_gate(iceberg_w_0_detect, [], [0])
+            state.add_custom_gate(iceberg_w_1_detect, [], [0])
     return state

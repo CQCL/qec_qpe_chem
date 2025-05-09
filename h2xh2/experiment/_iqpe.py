@@ -2,7 +2,6 @@ from typing import (
     Callable,
     NamedTuple,
 )
-import numpy as np
 from pytket.circuit import Circuit
 from pytket.backends.backendresult import BackendResult
 from ..encode import EncodeOptions, InterpretOptions

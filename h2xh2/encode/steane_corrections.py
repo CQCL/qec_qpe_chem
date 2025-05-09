@@ -5,8 +5,6 @@ from typing import Dict, List, Tuple
 from .state_prep import get_non_ft_prep, get_ft_prep
 from .basic_gates import get_H, get_CX, get_Measure
 from itertools import product
-from functools import reduce
-from operator import xor
 
 
 def classical_steane_decoding(

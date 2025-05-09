@@ -9,11 +9,9 @@ from typing import List
 from .state_prep import (
     get_non_ft_rz_plus_prep,
     get_ft_prep,
-    get_non_ft_prep,
-    get_prep_rz_part_ft_goto,
 )
-from .basic_gates import get_S, get_Z, get_Sdg, get_H, get_CX, get_Measure
-from .iceberg_detections import iceberg_detect_z, iceberg_detect_zx
+from .basic_gates import get_S, get_Z, get_Sdg, get_H, get_CX
+from .iceberg_detections import iceberg_detect_zx
 from .steane_corrections import classical_steane_decoding
 
 
