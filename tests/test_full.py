@@ -8,14 +8,11 @@ from h2xh2.encode import (
     RzMode,
     RzOptionsBinFracNonFT,
     RzOptionsBinFracPartFT,
-    RzKPartFt,
 )
 
 from pytket.circuit import Circuit, Bit, Qubit, Pauli, PauliExpBox
 from pytket.backends.backendresult import BackendResult
 from utils import compile_and_run
-
-from pytket.passes import DecomposeBoxes
 
 
 def test_basic():

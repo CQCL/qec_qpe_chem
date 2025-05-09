@@ -9,7 +9,6 @@ from pytket.extensions.quantinuum import (
     QuantinuumAPIOffline,
     Language,
 )
-from pytket.qasm import circuit_to_qasm_str
 
 
 def compile_and_run(circuit: Circuit, n_shots: int) -> BackendResult:
