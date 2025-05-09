@@ -17,6 +17,7 @@ from utils import compile_and_run
 
 from pytket.passes import DecomposeBoxes
 
+
 def test_basic():
     encoded: Circuit = get_encoded_circuit(Circuit(2, 2).X(1).measure_all())
     logical_result: BackendResult = get_decoded_result(compile_and_run(encoded, 10))
@@ -85,6 +86,7 @@ def test_bin_frac_rz_tdg():
     logical_result: BackendResult = get_decoded_result(compile_and_run(encoded, 10))
     assert list(logical_result.get_counts().keys()) == [(0,)]
 
+
 def test_part_goto_rz_tdg():
     phase: float = 0.25
     logical: Circuit = (
@@ -100,13 +102,12 @@ def test_part_goto_rz_tdg():
     )
     encoded: Circuit = get_encoded_circuit(
         logical,
-        rz_mode=RzMode.BIN_FRAC_PART_FT,  
+        rz_mode=RzMode.BIN_FRAC_PART_FT,
         rz_options=RzOptionsBinFracPartFT(10, 10),
     )
     result: BackendResult = compile_and_run(encoded, 10)
     logical_result: BackendResult = get_decoded_result(result)
     assert list(logical_result.get_counts().keys()) == [(0,)]
-
 
 
 def test_discard():

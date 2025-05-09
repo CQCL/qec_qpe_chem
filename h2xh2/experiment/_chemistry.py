@@ -37,6 +37,7 @@ class ChemData(NamedTuple):
 
 _chem_data = ChemData()
 
+
 def resolve_phase(phase: float, max_bits: int = 10) -> list[int]:
     phase_ = phase % 2.0
     bits = []
@@ -54,6 +55,7 @@ def resolve_phase(phase: float, max_bits: int = 10) -> list[int]:
         if phase_ < atol:
             break
     return bits
+
 
 def _add_ctrlu_0(
     circ: Circuit,

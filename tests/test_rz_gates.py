@@ -372,6 +372,7 @@ def test_rz_k_meas_ft() -> None:
     for bitstring in r.get_counts(cbits=data_bits):
         assert sum(bitstring) % 2 == 0
 
+
 def test_rz_part_ft() -> None:
     data_qubits: List[Qubit] = [Qubit("data_q", i) for i in range(7)]
     data_bits: List[Bit] = [Bit("data_b", i) for i in range(7)]
@@ -380,9 +381,7 @@ def test_rz_part_ft() -> None:
     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
     flag_bit: Bit = Bit("flag_b", 0)
     condition_bit: Bit = Bit("condition_b", 0)
-    syndrome_bits: List[Bit] = [Bit("synd_b", i) for i in range(5
-
-    )]
+    syndrome_bits: List[Bit] = [Bit("synd_b", i) for i in range(5)]
 
     c: Circuit = get_non_ft_prep(data_qubits)
     c.append(get_H(data_qubits))
@@ -413,6 +412,7 @@ def test_rz_part_ft() -> None:
     for bitstring in r.get_counts(cbits=data_bits):
         assert sum(bitstring) % 2 == 0
 
+
 def test_rz_k_part_ft() -> None:
     data_qubits: List[Qubit] = [Qubit("data_q", i) for i in range(7)]
     data_bits: List[Bit] = [Bit("data_b", i) for i in range(7)]
@@ -421,9 +421,7 @@ def test_rz_k_part_ft() -> None:
     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
     flag_bit: Bit = Bit("flag_b", 0)
     condition_bit: Bit = Bit("condition_b", 0)
-    syndrome_bits: List[Bit] = [Bit("synd_b", i) for i in range(5
-
-    )]
+    syndrome_bits: List[Bit] = [Bit("synd_b", i) for i in range(5)]
 
     c: Circuit = get_non_ft_prep(data_qubits)
     c.append(get_H(data_qubits))
@@ -459,7 +457,7 @@ if __name__ == "__main__":
     test_rz_part_ft_goto()
 
 
-# def test_rz_k_part_ft_goto() -> None:    
+# def test_rz_k_part_ft_goto() -> None:
 #     data_qubits: List[Qubit] = [Qubit("data_q", i) for i in range(7)]
 #     data_bits: List[Bit] = [Bit("data_b", i) for i in range(7)]
 #     ancilla_qubits: List[Qubit] = [Qubit("ancilla_q", i) for i in range(7)]

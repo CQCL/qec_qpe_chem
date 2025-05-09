@@ -14,7 +14,6 @@ def test_non_ft_prep_identity() -> None:
         c.add_bit(b)
         c.Measure(q, b)
 
-
     # should always return even parity strings
     bs_set = set()
     for bitstring in compile_and_run(c, 100).get_counts(cbits=bits):

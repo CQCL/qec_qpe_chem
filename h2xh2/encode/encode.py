@@ -78,7 +78,7 @@ class RzOptionsBinFracMeasFT(NamedTuple):
 
 
 class RzOptionsBinFracPartFT(NamedTuple):
-    """Options for the RzMode.BIN_FRAC_PART_FT and 
+    """Options for the RzMode.BIN_FRAC_PART_FT and
     RzMode.BIN_FRAC_PART_FT_GOTO.
 
     Args:
@@ -401,7 +401,9 @@ def get_encoded_circuit(
                         )
                     case RzMode.BIN_FRAC_PART_FT:
                         encoded_circuit.append(
-                            RzKPartFt(rz_options.max_rus, rz_options.max_bits).get_circuit(
+                            RzKPartFt(
+                                rz_options.max_rus, rz_options.max_bits
+                            ).get_circuit(
                                 phase,
                                 data_qubits,
                                 ancilla_qubits,
@@ -451,7 +453,9 @@ def get_encoded_circuit(
                         )
                     case RzMode.BIN_FRAC_PART_FT:
                         encoded_circuit.append(
-                            RzKPartFt(rz_options.max_rus, rz_options.max_bits).get_circuit(
+                            RzKPartFt(
+                                rz_options.max_rus, rz_options.max_bits
+                            ).get_circuit(
                                 phase,
                                 data_qubits,
                                 ancilla_qubits,
@@ -502,7 +506,9 @@ def get_encoded_circuit(
                         )
                     case RzMode.BIN_FRAC_PART_FT:
                         encoded_circuit.append(
-                            RzKPartFt(rz_options.max_rus, rz_options.max_bits).get_circuit(
+                            RzKPartFt(
+                                rz_options.max_rus, rz_options.max_bits
+                            ).get_circuit(
                                 phase,
                                 data_qubits,
                                 ancilla_qubits,

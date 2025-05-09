@@ -6,8 +6,13 @@ from pytket import Bit, Circuit, Qubit
 from pytket.circuit import CircBox, ClBitVar, ClExpr, ClOp, WiredClExpr
 from typing import List
 
-from .state_prep import get_non_ft_rz_plus_prep, get_ft_prep, get_non_ft_prep, get_prep_rz_part_ft_goto
-from .basic_gates import get_S, get_Z, get_Sdg, get_H, get_CX,  get_Measure
+from .state_prep import (
+    get_non_ft_rz_plus_prep,
+    get_ft_prep,
+    get_non_ft_prep,
+    get_prep_rz_part_ft_goto,
+)
+from .basic_gates import get_S, get_Z, get_Sdg, get_H, get_CX, get_Measure
 from .iceberg_detections import iceberg_detect_z, iceberg_detect_zx
 from .steane_corrections import classical_steane_decoding
 
@@ -438,7 +443,7 @@ class RzPartFt(RzEncoding):
         # Rz Gate
         repeat.append(RzDirect.get_circuit(phase, data_qubits))
         # Check for errors
-        
+
         repeat.append(
             iceberg_detect_zx(
                 0, data_qubits, ancilla_qubits, syndrome_bits[1:3], Bit("dummy", 0)
@@ -711,7 +716,6 @@ class RzKNonFt(RzEncoding):
         return c
 
 
-
 class RzKMeasFt(RzKNonFt):
     def __init__(self, _max_bits: int):
         self.max_bits_ = _max_bits
@@ -800,6 +804,7 @@ class RzKMeasFt(RzKNonFt):
         )
         return c
 
+
 class RzKPartFt(RzKNonFt):
     def __init__(self, _max_rus: int, _max_bits: int):
         self.max_bits_ = _max_bits
@@ -831,7 +836,9 @@ class RzKPartFt(RzKNonFt):
         c = Circuit()
         for q in data_qubits + ancilla_qubits + prep_qubits:
             c.add_qubit(q)
-        for b in ancilla_bits + syndrome_bits + [flag_bit, condition_bit, Bit("dummy", 0)]:
+        for b in (
+            ancilla_bits + syndrome_bits + [flag_bit, condition_bit, Bit("dummy", 0)]
+        ):
             c.add_bit(b)
         if head:
             c.add_c_setbits([True], [condition_bit])

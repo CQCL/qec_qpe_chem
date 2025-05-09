@@ -16,7 +16,7 @@ def classical_steane_decoding(
     assert len(ancilla_bits) == 7
     assert len(syndrome_bits) == 3
     c: Circuit = Circuit()
-    scratch_bits: List[Bit] = [Bit("scratch", i) for i in range(2)]     
+    scratch_bits: List[Bit] = [Bit("scratch", i) for i in range(2)]
     for b in ancilla_bits + syndrome_bits + scratch_bits:
         c.add_bit(b)
 
