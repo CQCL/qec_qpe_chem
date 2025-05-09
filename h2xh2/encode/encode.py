@@ -18,7 +18,7 @@ from .basic_gates import (
 
 from .steane_corrections import steane_z_correction, steane_x_correction
 from .iceberg_detections import iceberg_detect_x, iceberg_detect_z, iceberg_detect_zx
-from .rz_encoding import RzDirect, RzKNonFt, RzKMeasFt, RzPartFt
+from .rz_encoding import RzDirect, RzKNonFt, RzKMeasFt, RzPartFt, RzKPartFt
 from .state_prep import get_non_ft_prep
 
 
@@ -89,7 +89,7 @@ class RzOptionsBinFracPartFT(NamedTuple):
     """
 
     max_bits: int = 10
-    n_rus: int = 1
+    max_rus: int = 1
 
 
 class EncodeData(NamedTuple):
@@ -401,7 +401,7 @@ def get_encoded_circuit(
                         )
                     case RzMode.BIN_FRAC_PART_FT:
                         encoded_circuit.append(
-                            RzPartFt(rz_options.max_bits).get_circuit(
+                            RzKPartFt(rz_options.max_rus, rz_options.max_bits).get_circuit(
                                 phase,
                                 data_qubits,
                                 ancilla_qubits,
@@ -410,12 +410,7 @@ def get_encoded_circuit(
                                 part_ft_syndrome_bits,
                                 flag_bit,
                                 condition_bit,
-                            )
-                        )
-                    case RzMode.BIN_FRAC_PART_FT_GOTO:
-                        encoded_circuit.append(
-                            RzPartFtgoto(rz_options.max_bits).get_circuit(
-                                ...
+                                True,
                             )
                         )
                     case _:
@@ -456,7 +451,7 @@ def get_encoded_circuit(
                         )
                     case RzMode.BIN_FRAC_PART_FT:
                         encoded_circuit.append(
-                            RzPartFt(rz_options.max_bits).get_circuit(
+                            RzKPartFt(rz_options.max_rus, rz_options.max_bits).get_circuit(
                                 phase,
                                 data_qubits,
                                 ancilla_qubits,
@@ -465,9 +460,9 @@ def get_encoded_circuit(
                                 part_ft_syndrome_bits,
                                 flag_bit,
                                 condition_bit,
+                                True,
                             )
                         )
-
                     case _:
                         assert False
 
@@ -507,7 +502,7 @@ def get_encoded_circuit(
                         )
                     case RzMode.BIN_FRAC_PART_FT:
                         encoded_circuit.append(
-                            RzPartFt(rz_options.max_bits).get_circuit(
+                            RzKPartFt(rz_options.max_rus, rz_options.max_bits).get_circuit(
                                 phase,
                                 data_qubits,
                                 ancilla_qubits,
@@ -516,9 +511,9 @@ def get_encoded_circuit(
                                 part_ft_syndrome_bits,
                                 flag_bit,
                                 condition_bit,
+                                True,
                             )
                         )
-
                     case _:
                         assert False
 

@@ -12,6 +12,7 @@ from .rz_encoding import (
     RzRusNonFt,
     RzMeasFt,
     RzPartFt,
+    RzKPartFt,
     RzKNonFt,
     RzKMeasFt,
 )

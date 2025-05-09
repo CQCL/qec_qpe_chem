@@ -1,4 +1,5 @@
-from pytket.circuit import Circuit, Bit, Qubit, OpType
+from pytket.circuit import Circuit, Bit, Qubit, OpType, CircBox, ClBitVar, ClExpr, ClOp, WiredClExpr
+
 from typing import List
 from .iceberg_detections import iceberg_detect_zx
 

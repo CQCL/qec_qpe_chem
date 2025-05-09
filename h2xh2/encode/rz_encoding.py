@@ -7,7 +7,7 @@ from pytket.circuit import CircBox, ClBitVar, ClExpr, ClOp, WiredClExpr
 from typing import List
 
 from .state_prep import get_non_ft_rz_plus_prep, get_ft_prep, get_non_ft_prep, get_prep_rz_part_ft_goto
-from .basic_gates import get_S, get_Z, get_Sdg, get_H, get_CX
+from .basic_gates import get_S, get_Z, get_Sdg, get_H, get_CX,  get_Measure
 from .iceberg_detections import iceberg_detect_z, iceberg_detect_zx
 from .steane_corrections import classical_steane_decoding
 
@@ -438,14 +438,14 @@ class RzPartFt(RzEncoding):
         # Rz Gate
         repeat.append(RzDirect.get_circuit(phase, data_qubits))
         # Check for errors
-        #
+        
         repeat.append(
             iceberg_detect_zx(
                 0, data_qubits, ancilla_qubits, syndrome_bits[1:3], Bit("dummy", 0)
             )
         )
         repeat.append(
-            iceberg_detect_z(
+            iceberg_detect_zx(
                 1, data_qubits, ancilla_qubits, syndrome_bits[3:5], Bit("dummy", 0)
             )
         )
@@ -516,7 +516,7 @@ class RzPartFt(RzEncoding):
         scratch_bits: List[Bit] = [Bit("scratch", i) for i in range(5)]
 
         c: Circuit = Circuit()
-        for q in data_qubits + ancilla_qubits:
+        for q in data_qubits + ancilla_qubits + prep_qubits:
             c.add_qubit(q)
         for b in (
             ancilla_bits + syndrome_bits + scratch_bits + [flag_bit, condition_bit]
@@ -534,6 +534,7 @@ class RzPartFt(RzEncoding):
         # Ft Measure
         for q, b in zip(ancilla_qubits, ancilla_bits):
             c.Measure(q, b)
+
         # Write parity to syndrome_bits[3]
         c.add_clexpr(
             WiredClExpr(
@@ -586,85 +587,6 @@ class RzPartFt(RzEncoding):
 
         c.append(classical_steane_decoding(ancilla_bits, syndrome_bits[:3]))
 
-        # # Do syndrome checks
-        # # write 0,1,2,3 parity to syndrome bit 0
-        # c.add_clexpr(
-        #     WiredClExpr(
-        #         expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
-        #         bit_posn={i: i for i in range(2)},
-        #         output_posn=[2],
-        #     ),
-        #     [ancilla_bits[0], ancilla_bits[1], scratch_bits[0]],
-        # )
-        # c.add_clexpr(
-        #     WiredClExpr(
-        #         expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
-        #         bit_posn={i: i for i in range(2)},
-        #         output_posn=[2],
-        #     ),
-        #     [ancilla_bits[2], scratch_bits[0], scratch_bits[1]],
-        # )
-        # c.add_clexpr(
-        #     WiredClExpr(
-        #         expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
-        #         bit_posn={i: i for i in range(2)},
-        #         output_posn=[2],
-        #     ),
-        #     [ancilla_bits[3], scratch_bits[1], syndrome_bits[0]],
-        # )
-
-        # # write 1,2,4,5 parity to syndrome bit 1
-        # c.add_clexpr(
-        #     WiredClExpr(
-        #         expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
-        #         bit_posn={i: i for i in range(2)},
-        #         output_posn=[2],
-        #     ),
-        #     [ancilla_bits[1], ancilla_bits[2], scratch_bits[0]],
-        # )
-        # c.add_clexpr(
-        #     WiredClExpr(
-        #         expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
-        #         bit_posn={i: i for i in range(2)},
-        #         output_posn=[2],
-        #     ),
-        #     [ancilla_bits[4], scratch_bits[0], scratch_bits[1]],
-        # )
-        # c.add_clexpr(
-        #     WiredClExpr(
-        #         expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
-        #         bit_posn={i: i for i in range(2)},
-        #         output_posn=[2],
-        #     ),
-        #     [ancilla_bits[5], scratch_bits[1], syndrome_bits[1]],
-        # )
-
-        # # write 2,3,5,6 parity to syndrome bit 2
-        # c.add_clexpr(
-        #     WiredClExpr(
-        #         expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
-        #         bit_posn={i: i for i in range(2)},
-        #         output_posn=[2],
-        #     ),
-        #     [ancilla_bits[2], ancilla_bits[3], scratch_bits[0]],
-        # )
-        # c.add_clexpr(
-        #     WiredClExpr(
-        #         expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
-        #         bit_posn={i: i for i in range(2)},
-        #         output_posn=[2],
-        #     ),
-        #     [ancilla_bits[5], scratch_bits[0], scratch_bits[1]],
-        # )
-        # c.add_clexpr(
-        #     WiredClExpr(
-        #         expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(2)]),
-        #         bit_posn={i: i for i in range(2)},
-        #         output_posn=[2],
-        #     ),
-        #     [ancilla_bits[6], scratch_bits[1], syndrome_bits[2]],
-        # )
-
         # Check error
         c.add_clexpr(
             WiredClExpr(
@@ -694,55 +616,6 @@ class RzPartFt(RzEncoding):
         )
         return c
 
-
-
-
-# class RzPartFtgoto(RzEncoding):
-
-#     def __init__(self, _max_rus: int):
-#         self.max_rus_ = _max_rus
-
-#     def get_circuit(
-#         self,
-#         phase: float,
-#         data_qubits: List[Qubit],
-#         ancilla_qubits: List[Qubit],
-#         ancilla_bits: List[Bit],
-#         syndrome_bits: List[Bit],
-#         flag_bit: Bit,
-#         condition_bit: Bit,
-#     ) -> Circuit:
-#         assert len(data_qubits) == 7    
-#         assert len(ancilla_qubits) == 9
-#         assert len(ancilla_bits) == 7
-#         assert len(syndrome_bits) == 4
-
-#         c = Circuit()
-#         for q in data_qubits + ancilla_qubits:
-#             c.add_qubit(q)
-#         c.add_barrier(data_qubits + ancilla_qubits)
-
-#         c.append(get_prep_rz_part_ft_goto(phase, ancilla_qubits[:7], ancilla_qubits[7:9]), syndrome_bits, flag_bit, self.max_rus_)
-
-#         # teleport
-#         c.append(get_CX(data_qubits, ancilla_qubits[:7]))
-#         c.append(get_Measure(ancilla_qubits[:7], ancilla_bits))
-
-#         # syndrome checks
-#         c.append(classical_steane_decoding(ancilla_bits, syndrome_bits))
-
-    
-
-#         # check for errors
-#         # first write output parity
-#         c.add_clexpr(
-#             WiredClExpr(
-#                 expr=ClExpr(op=ClOp.BitXor, args=[ClBitVar(i) for i in range(7)]),
-#                 bit_posn={i: i for i in range(7)},
-#                 output_posn = [7],
-#             )
-#             ancilla_bits + [syndrome_bits[3]]
-#         )
 
 class RzKNonFt(RzEncoding):
     def __init__(self, _max_bits: int):
@@ -927,100 +800,98 @@ class RzKMeasFt(RzKNonFt):
         )
         return c
 
+class RzKPartFt(RzKNonFt):
+    def __init__(self, _max_rus: int, _max_bits: int):
+        self.max_bits_ = _max_bits
+        self.max_rus_ = _max_rus
 
+    def get_circuit(
+        self,
+        phase: float,
+        data_qubits: List[Qubit],
+        ancilla_qubits: List[Qubit],
+        ancilla_bits: List[Bit],
+        prep_qubits: List[Qubit],
+        syndrome_bits: List[Bit],
+        flag_bit: Bit,
+        condition_bit: Bit,
+        head: bool,
+    ) -> Circuit:
+        assert len(data_qubits) == 7
+        assert len(ancilla_qubits) == 7
+        assert len(ancilla_bits) == 7
+        assert len(prep_qubits) == 2
+        assert len(syndrome_bits) == 5
+        #  we require recursion as we classically condition all added phase gates on the measurement of the previous step
+        binary_expansion: List[Bit] = RzKNonFt.resolve_phase(phase, self.max_bits_)
+        # skim binary expansion to remove last n zero terms
+        while binary_expansion[-1] == False:
+            assert binary_expansion.pop() == False
 
-# class RzKPartFtgoto(RzEncoding):
-#     def __init__(self, _max_rus: int, _max_bits: int ):
-#         self.max_rus_ = _max_rus
-#         self.max_bits_ = _max_bits
+        c = Circuit()
+        for q in data_qubits + ancilla_qubits + prep_qubits:
+            c.add_qubit(q)
+        for b in ancilla_bits + syndrome_bits + [flag_bit, condition_bit, Bit("dummy", 0)]:
+            c.add_bit(b)
+        if head:
+            c.add_c_setbits([True], [condition_bit])
 
-#     def get_circuit(
-#         self,
-#         phase: float,
-#         data_qubits: List[Qubit],
-#         ancilla_qubits: List[Qubit],
-#         ancilla_bits: List[Bit],
-#         syndrome_bits: List[Bit],
-#         condition_bit: Bit,
-#         head: bool,
-#     ) -> Circuit:
+        match binary_expansion:
+            # => I
+            case ():
+                return c
+            # => Z
+            case (1,):
+                c.add_circbox(
+                    CircBox(get_Z(data_qubits)), data_qubits, condition=condition_bit
+                )
+                return c
+            # => S
+            case (0, 1):
+                c.add_circbox(
+                    CircBox(get_S(data_qubits)), data_qubits, condition=condition_bit
+                )
+                return c
+            # => Sdg
+            case (1, 1):
+                c.add_circbox(
+                    CircBox(get_Sdg(data_qubits)), data_qubits, condition=condition_bit
+                )
+                return c
 
-#         assert len(data_qubits) == 7    
-#         assert len(ancilla_qubits) == 9
-#         assert len(ancilla_bits) == 7
-#         assert len(syndrome_bits) == 4
+        rz_part_c: Circuit = RzPartFt(self.max_rus_).get_circuit(
+            phase,
+            data_qubits,
+            ancilla_qubits,
+            ancilla_bits,
+            prep_qubits,
+            syndrome_bits,
+            flag_bit,
+            condition_bit,
+        )
+        for b in [Bit("scratch", i) for i in range(6)]:
+            c.add_bit(b)
 
+        c.add_circbox(
+            CircBox(rz_part_c),
+            rz_part_c.qubits + rz_part_c.bits,
+            condition=condition_bit,
+        )
 
-#         #  we require recursion as we classically condition all added phase gates on the measurement of the previous step
-#         binary_expansion: List[Bit] = RzKNonFt.resolve_phase(phase, self.max_bits_)
-#         # skim binary expansion to remove last n zero terms
-#         while binary_expansion[-1] == False:
-#             assert binary_expansion.pop() == False
-
-#         c = Circuit()
-#         for q in data_qubits + ancilla_qubits:
-#             c.add_qubit(q)
-#         for b in ancilla_bits + syndrome_bits + [condition_bit]:
-#             c.add_bit(b)
-#         if head:
-#             c.add_c_setbits([True], [condition_bit])
-
-#         match binary_expansion:
-#             # => I
-#             case ():
-#                 return c
-#             # => Z
-#             case (1,):
-#                 c.add_circbox(
-#                     CircBox(get_Z(data_qubits)), data_qubits, condition=condition_bit
-#                 )
-#                 return c
-#             # => S
-#             case (0, 1):
-#                 c.add_circbox(
-#                     CircBox(get_S(data_qubits)), data_qubits, condition=condition_bit
-#                 )
-#                 return c
-#             # => Sdg
-#             case (1, 1):
-#                 c.add_circbox(
-#                     CircBox(get_Sdg(data_qubits)), data_qubits, condition=condition_bit
-#                 )
-#                 return c
-
-#         # rz_meas_c: Circuit = RzMeasFt().get_circuit(
-#         #     phase,
-#         #     data_qubits,
-#         #     ancilla_qubits,
-#         #     ancilla_bits,
-#         #     syndrome_bits,
-#         #     condition_bit,
-#         # )
-
-#         rz_goto_c: circuit = get_prep_rz_part_ft_goto(phase, ancilla_qubits[:7], ancilla_qubits[7:9], syndrome_bits, flag_bit, self.max_rus_)
-
-
-#         for b in [Bit("scratch", i) for i in range(6)]:
-#             c.add_bit(b)
-
-#         c.add_circbox(
-#             CircBox(rz_goto_C),
-#             rz_goto_c.qubits + rz_goto_c.bits,
-#             condition=condition_bit,
-#         )
-
-#         updated_phase: float = sum(
-#             [float(kval) * 2**-i for i, kval in enumerate(binary_expansion[1:])]
-#         )
-#         c.append(
-#             RzKPartFtgoto(self.max_rus_, self.max_bits_).get_circuit(
-#                 updated_phase,
-#                 data_qubits,
-#                 ancilla_qubits,
-#                 ancilla_bits,
-#                 syndrome_bits,
-#                 condition_bit,
-#                 False,
-#             )
-#         )
-#         return c
+        updated_phase: float = sum(
+            [float(kval) * 2**-i for i, kval in enumerate(binary_expansion[1:])]
+        )
+        c.append(
+            RzKPartFt(self.max_rus_, self.max_bits_).get_circuit(
+                updated_phase,
+                data_qubits,
+                ancilla_qubits,
+                ancilla_bits,
+                prep_qubits,
+                syndrome_bits,
+                flag_bit,
+                condition_bit,
+                False,
+            )
+        )
+        return c

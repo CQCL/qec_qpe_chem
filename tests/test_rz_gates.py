@@ -372,13 +372,17 @@ def test_rz_k_meas_ft() -> None:
     for bitstring in r.get_counts(cbits=data_bits):
         assert sum(bitstring) % 2 == 0
 
-def test_rz_part_ft_goto() -> None:
+def test_rz_part_ft() -> None:
     data_qubits: List[Qubit] = [Qubit("data_q", i) for i in range(7)]
     data_bits: List[Bit] = [Bit("data_b", i) for i in range(7)]
     ancilla_qubits: List[Qubit] = [Qubit("ancilla_q", i) for i in range(7)]
+    prep_qubits: List[Qubit] = [Qubit("prep_q", i) for i in range(2)]
     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
+    flag_bit: Bit = Bit("flag_b", 0)
     condition_bit: Bit = Bit("condition_b", 0)
-    syndrome_bits: List[Bit] = [Bit("synd_b", i) for i in range(3)]
+    syndrome_bits: List[Bit] = [Bit("synd_b", i) for i in range(5
+
+    )]
 
     c: Circuit = get_non_ft_prep(data_qubits)
     c.append(get_H(data_qubits))
@@ -387,12 +391,14 @@ def test_rz_part_ft_goto() -> None:
     phase: float = 0.25
     # Inject magic state
     c.append(
-        RzMeasFt().get_circuit(
+        RzPartFt(8).get_circuit(
             phase,
             data_qubits,
             ancilla_qubits,
             ancilla_bits,
+            prep_qubits,
             syndrome_bits,
+            flag_bit,
             condition_bit,
         )
     )
@@ -407,34 +413,37 @@ def test_rz_part_ft_goto() -> None:
     for bitstring in r.get_counts(cbits=data_bits):
         assert sum(bitstring) % 2 == 0
 
-def test_rz_k_part_ft_goto() -> None:    
+def test_rz_k_part_ft() -> None:
     data_qubits: List[Qubit] = [Qubit("data_q", i) for i in range(7)]
     data_bits: List[Bit] = [Bit("data_b", i) for i in range(7)]
     ancilla_qubits: List[Qubit] = [Qubit("ancilla_q", i) for i in range(7)]
+    prep_qubits: List[Qubit] = [Qubit("prep_q", i) for i in range(2)]
     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
+    flag_bit: Bit = Bit("flag_b", 0)
     condition_bit: Bit = Bit("condition_b", 0)
-    syndrome_bits: List[Bit] = [Bit("synd_b", i) for i in range(3)]
+    syndrome_bits: List[Bit] = [Bit("synd_b", i) for i in range(5
 
-    c: Circuit = Circuit()
-    # Non-FT |+> prep
-    c.append(get_non_ft_prep(data_qubits))
+    )]
+
+    c: Circuit = get_non_ft_prep(data_qubits)
     c.append(get_H(data_qubits))
-
-    phase: float = 1.65625
-    assert RzKNonFt.resolve_phase(phase, 6) == [True, True, False, True, False, True]
-
+    c.add_bit(condition_bit)
+    c.add_c_setbits([True], [condition_bit])
+    phase: float = 0.25
+    # Inject magic state
     c.append(
-        RzKMeasFt(6).get_circuit(
+        RzKPartFt(8).get_circuit(
             phase,
             data_qubits,
             ancilla_qubits,
             ancilla_bits,
+            prep_qubits,
             syndrome_bits,
+            flag_bit,
             condition_bit,
-            True,
         )
     )
-    c.add_barrier(data_qubits)
+    c.add_circbox(CircBox(get_S(data_qubits)), data_qubits, condition=condition_bit)
     c.append(RzDirect.get_circuit(-phase, data_qubits))
 
     # X Measurement
@@ -442,6 +451,49 @@ def test_rz_k_part_ft_goto() -> None:
     c.append(get_Measure(data_qubits, data_bits))
 
     r: BackendResult = compile_and_run(c, 10)
-
     for bitstring in r.get_counts(cbits=data_bits):
         assert sum(bitstring) % 2 == 0
+
+
+if __name__ == "__main__":
+    test_rz_part_ft_goto()
+
+
+# def test_rz_k_part_ft_goto() -> None:    
+#     data_qubits: List[Qubit] = [Qubit("data_q", i) for i in range(7)]
+#     data_bits: List[Bit] = [Bit("data_b", i) for i in range(7)]
+#     ancilla_qubits: List[Qubit] = [Qubit("ancilla_q", i) for i in range(7)]
+#     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
+#     condition_bit: Bit = Bit("condition_b", 0)
+#     syndrome_bits: List[Bit] = [Bit("synd_b", i) for i in range(3)]
+
+#     c: Circuit = Circuit()
+#     # Non-FT |+> prep
+#     c.append(get_non_ft_prep(data_qubits))
+#     c.append(get_H(data_qubits))
+
+#     phase: float = 1.65625
+#     assert RzKNonFt.resolve_phase(phase, 6) == [True, True, False, True, False, True]
+
+#     c.append(
+#         RzKMeasFt(6).get_circuit(
+#             phase,
+#             data_qubits,
+#             ancilla_qubits,
+#             ancilla_bits,
+#             syndrome_bits,
+#             condition_bit,
+#             True,
+#         )
+#     )
+#     c.add_barrier(data_qubits)
+#     c.append(RzDirect.get_circuit(-phase, data_qubits))
+
+#     # X Measurement
+#     c.append(get_H(data_qubits))
+#     c.append(get_Measure(data_qubits, data_bits))
+
+#     r: BackendResult = compile_and_run(c, 10)
+
+#     for bitstring in r.get_counts(cbits=data_bits):
+#         assert sum(bitstring) % 2 == 0

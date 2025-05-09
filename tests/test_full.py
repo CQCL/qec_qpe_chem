@@ -7,6 +7,8 @@ from h2xh2.encode import (
     get_decoded_result,
     RzMode,
     RzOptionsBinFracNonFT,
+    RzOptionsBinFracPartFT,
+    RzKPartFt,
 )
 
 from pytket.circuit import Circuit, Bit, Qubit, Pauli, PauliExpBox
@@ -82,6 +84,29 @@ def test_bin_frac_rz_tdg():
     )
     logical_result: BackendResult = get_decoded_result(compile_and_run(encoded, 10))
     assert list(logical_result.get_counts().keys()) == [(0,)]
+
+def test_part_goto_rz_tdg():
+    phase: float = 0.25
+    logical: Circuit = (
+        Circuit(1, 1)
+        .H(0)
+        .Rz(phase, 0)
+        .add_barrier([Qubit(0)])
+        .Tdg(0)
+        .H(0)
+        .add_barrier([Qubit(0)])
+        .add_custom_gate(steane_z_correct, [], [0])
+        .measure_all()
+    )
+    encoded: Circuit = get_encoded_circuit(
+        logical,
+        rz_mode=RzMode.BIN_FRAC_PART_FT,  
+        rz_options=RzOptionsBinFracPartFT(10, 10),
+    )
+    result: BackendResult = compile_and_run(encoded, 10)
+    logical_result: BackendResult = get_decoded_result(result)
+    assert list(logical_result.get_counts().keys()) == [(0,)]
+
 
 
 def test_discard():
