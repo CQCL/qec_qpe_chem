@@ -1,4 +1,4 @@
-from h2xh2.encode import get_non_ft_prep, get_ft_prep
+from h2xh2.encode import get_non_ft_prep, get_ft_prep  # type: ignore
 from pytket import Bit, Circuit, Qubit
 from pytket.backends.backendresult import BackendResult
 from pytket.circuit import CircBox, UnitID
@@ -123,7 +123,7 @@ def test_ft_cond_prep_on() -> None:
     prep: Circuit = get_ft_prep(data_qubits, goto_qubit, goto_bit)
 
     c.add_c_setbits([True], [condition_bit])
-    args: List[UnitID] = prep.qubits + prep.bits
+    args: List[UnitID] = prep.qubits + prep.bits  # type: ignore
 
     cbox: CircBox = CircBox(prep)
     c.add_circbox(cbox, args, condition=condition_bit)
@@ -153,7 +153,7 @@ def test_ft_cond_prep_off() -> None:
     prep: Circuit = get_ft_prep(data_qubits, goto_qubit, goto_bit)
 
     c.add_c_setbits([False], [condition_bit])
-    args: List[UnitID] = prep.qubits + prep.bits
+    args: List[UnitID] = prep.qubits + prep.bits  # type: ignore
 
     cbox: CircBox = CircBox(prep)
     c.add_circbox(cbox, args, condition=condition_bit)

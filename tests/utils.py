@@ -13,7 +13,7 @@ from pytket.extensions.quantinuum import (
 
 def compile_and_run(circuit: Circuit, n_shots: int) -> BackendResult:
     backend = QuantinuumBackend(
-        device_name="H1-1LE", api_handler=QuantinuumAPIOffline()
+        device_name="H1-1LE", api_handler=QuantinuumAPIOffline()  # type: ignore
     )
     compiled = backend.get_compiled_circuit(circuit, optimisation_level=0)
 

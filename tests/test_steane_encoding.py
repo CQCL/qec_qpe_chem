@@ -1,4 +1,4 @@
-from h2xh2.encode import (
+from h2xh2.encode import (  # type: ignore
     classical_steane_decoding,
     steane_z_correction,
     steane_x_correction,
@@ -32,7 +32,7 @@ def test_classical_steane_decoding() -> None:
 
 def test_steane_z_correction() -> None:
     data_qubits: List[Qubit] = [Qubit("data_q", i) for i in range(7)]
-    data_bits: List[Qubit] = [Bit("data_b", i) for i in range(7)]
+    data_bits: List[Bit] = [Bit("data_b", i) for i in range(7)]
     ancilla_qubits: List[Qubit] = [Qubit("ancilla_q", i) for i in range(7)]
     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
     syndrome_bits: List[Bit] = [Bit("syndrome", i) for i in range(3)]
@@ -61,7 +61,7 @@ def test_steane_z_correction() -> None:
         c.append(get_Measure(data_qubits, data_bits))
 
         r: BackendResult = compile_and_run(c, 10)
-        for k in r.get_counts(cbits=data_bits + syndrome_bits):
+        for k in r.get_counts(cbits=data_bits + syndrome_bits):  # type: ignore
             # check artifical error is detected
             assert sum(k[7:]) > 0
             # check artifical error has been corrected
@@ -71,7 +71,7 @@ def test_steane_z_correction() -> None:
 
 def test_steane_x_correction() -> None:
     data_qubits: List[Qubit] = [Qubit("data_q", i) for i in range(7)]
-    data_bits: List[Qubit] = [Bit("data_b", i) for i in range(7)]
+    data_bits: List[Bit] = [Bit("data_b", i) for i in range(7)]
     ancilla_qubits: List[Qubit] = [Qubit("ancilla_q", i) for i in range(7)]
     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
     syndrome_bits: List[Bit] = [Bit("syndrome", i) for i in range(3)]
@@ -100,7 +100,7 @@ def test_steane_x_correction() -> None:
         )
         c.append(get_Measure(data_qubits, data_bits))
         r: BackendResult = compile_and_run(c, 10)
-        for k in r.get_counts(cbits=data_bits + syndrome_bits):
+        for k in r.get_counts(cbits=data_bits + syndrome_bits):  # type: ignore
             # check artifical error is detected
             assert sum(k[7:]) > 0
             # check artifical error has been corrected
@@ -110,7 +110,7 @@ def test_steane_x_correction() -> None:
 
 def test_steane_xz_correction() -> None:
     data_qubits: List[Qubit] = [Qubit("data_q", i) for i in range(7)]
-    data_bits: List[Qubit] = [Bit("data_b", i) for i in range(7)]
+    data_bits: List[Bit] = [Bit("data_b", i) for i in range(7)]
     ancilla_qubits: List[Qubit] = [Qubit("ancilla_q", i) for i in range(7)]
     ancilla_bits: List[Bit] = [Bit("ancilla_b", i) for i in range(7)]
     syndrome_bits: List[Bit] = [Bit("syndrome", i) for i in range(3)]
@@ -152,7 +152,7 @@ def test_steane_xz_correction() -> None:
         )
         c.append(get_Measure(data_qubits, data_bits))
         r: BackendResult = compile_and_run(c, 5)
-        for k in r.get_counts(cbits=data_bits + syndrome_bits):
+        for k in r.get_counts(cbits=data_bits + syndrome_bits):  # type: ignore
             # check artifical error is detected
             assert sum(k[7:]) > 0
             # check artifical error has been corrected

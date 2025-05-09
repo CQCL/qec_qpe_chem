@@ -1,4 +1,4 @@
-from h2xh2.encode import (
+from h2xh2.encode import (  # type: ignore
     steane_z_correct,
     iceberg_x_0_detect,
     iceberg_w_0_detect,

@@ -1,4 +1,4 @@
-from h2xh2.encode import (
+from h2xh2.encode import (  # type: ignore
     RzDirect,
     RzNonFt,
     RzFtPrep,

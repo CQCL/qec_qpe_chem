@@ -1,4 +1,4 @@
-from h2xh2.encode import (
+from h2xh2.encode import (  # type: ignore
     iceberg_detect_zx,
     iceberg_detect_z,
     iceberg_detect_x,
