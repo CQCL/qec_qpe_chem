@@ -13,9 +13,10 @@
 # limitations under the License.
 
 """
-Code for auto generating logical circuits.
-
-# TODO: Fill in papers - Iceberg, Steane & Ciaran & colleagues hardware papers
+Code for auto generating logical circuits. This code uses techniques from:
+"Realization of Real-Time Fault-Tolerant Quantum Error Correction" https://doi.org/10.1103/PhysRevX.11.041058
+"Protecting Expressive Circuits with a Quantum Error Detection Code" https://doi.org/10.1038/s41567-023-02282-2
+"Benchmarking logical three-qubit quantum Fourier transform encoded in the Steane code on a trapped-ion quantum computer" https://doi.org/10.48550/arXiv.2404.08616
 """
 
 from .rz_encoding import (
