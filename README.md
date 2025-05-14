@@ -2,7 +2,7 @@
 H2xH2 project resources
 =======================
 
-This repostiry provides python tooling for running a Quantum Phase Estimation experiment for H2 on Quantinuum hardware. It provides automatic tooling for running experiments on Quantinuum hardware using Steane code primitives, with support for QEC cycles and Iceberg error detection cycles. Rz gates are implemented with gate teleportation techniques. This repository is built on top of the [`pytket`](https://tket.quantinuum.com/api-docs/) library and contains all relevant source code.
+This repository provides python tooling for running a Quantum Phase Estimation experiment for H2 on Quantinuum hardware. It provides automatic tooling for running experiments on Quantinuum hardware using Steane code primitives, with support for QEC cycles and Iceberg error detection cycles. Rz gates are implemented with gate teleportation techniques. This repository is built on top of the [`pytket`](https://tket.quantinuum.com/api-docs/) library and contains all relevant source code.
 
 `pytket` is a python module for interfacing with `TKET`, a quantum computing toolkit and optimising compiler developed by Quantinuum, and is available through `pip`. `pytket` is open source and documentation and use examples can be found at the [github repository](https://github.com/CQCL/pytket). <br>
 
