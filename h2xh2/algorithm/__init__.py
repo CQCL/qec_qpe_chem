@@ -23,6 +23,7 @@ from ._bayesian_qpe import (
     bayesian_update,
     update_log,
     get_ms,
+    bootstrap_sampling,
 )
 
 __all__ = [
@@ -32,4 +33,5 @@ __all__ = [
     "update_log",
     "get_ms",
     "get_mu_and_sigma",
+    "bootstrap_sampling",
 ]
