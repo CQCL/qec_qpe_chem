@@ -22,7 +22,12 @@ from pytket.circuit import (
     PauliExpBox,
     Pauli,
 )
-from ..encode import steane
+from ..encode import (
+    steane_z_correct,
+    steane_x_correct,
+    iceberg_w_0_detect,
+    iceberg_w_1_detect,
+)
 
 _APPROX_ENERGY: float = -1.13629792
 _DELTAT = 0.986620 / np.pi
@@ -44,6 +49,25 @@ class ChemData(NamedTuple):
 
 
 _chem_data = ChemData()
+
+
+def resolve_phase(phase: float, max_bits: int = 10) -> list[int]:
+    phase_ = phase % 2.0
+    bits = []
+    atol = 2 ** (-max_bits)
+    phase_ += atol
+    if phase_ > 2.0:
+        return bits
+    for i in range(max_bits):
+        val = 2**-i
+        if phase_ >= val:
+            bits.append(1)
+            phase_ -= val
+        else:
+            bits.append(0)
+        if phase_ < atol:
+            break
+    return bits
 
 
 def _add_ctrlu_0(
@@ -92,7 +116,7 @@ def _add_ctrlu_1(
         if ii + 1 >= k:
             break
         circ.add_barrier(circ.qubits)
-        steane.add_steane_x(circ, 0)
+        circ.add_custom_gate(steane_x_correct, [], [0])
         circ.add_barrier(circ.qubits)
     return circ
 
@@ -112,9 +136,9 @@ def _add_ctrlu_2(
         circ.CX(0, 1)
         # Steane QEC for X.
         circ.add_barrier(circ.qubits)
-        steane.add_steane_x(circ, 0)
+        circ.add_custom_gate(steane_x_correct, [], [0])
         circ.add_barrier(circ.qubits)
-        steane.add_steane_x(circ, 1)
+        circ.add_custom_gate(steane_x_correct, [], [1])
         circ.add_barrier(circ.qubits)
         # circ.CRx(2 * cx * deltat, 0, 1)
         circ.H(1)
@@ -128,11 +152,12 @@ def _add_ctrlu_2(
         if ii + 1 >= k:
             break
         circ.add_barrier(circ.qubits)
-        steane.add_steane_x(circ, 0)
-        steane.add_steane_z(circ, 0)
+
+        circ.add_custom_gate(steane_x_correct, [], [0])
+        circ.add_custom_gate(steane_z_correct, [], [0])
         circ.add_barrier(circ.qubits)
-        steane.add_steane_x(circ, 1)
-        steane.add_steane_z(circ, 1)
+        circ.add_custom_gate(steane_x_correct, [], [1])
+        circ.add_custom_gate(steane_z_correct, [], [1])
         circ.add_barrier(circ.qubits)
     return circ
 
@@ -156,12 +181,12 @@ def get_ctrl_func(
     def get_ctrlu(k: int) -> Circuit:
         circ = Circuit(2)
         # Round the rotation angle. This is done for the compatibility between plain and Stean.
-        bits = steane.resolve_phase(
+        bits = resolve_phase(
             _chem_data.CZ * _chem_data.DELTAT,
             max_bits=_chem_data.MAX_BITS,
         )
         angle_z = sum([a * 2**-i for i, a in enumerate(bits)])
-        bits = steane.resolve_phase(
+        bits = resolve_phase(
             _chem_data.CX * _chem_data.DELTAT,
             max_bits=_chem_data.MAX_BITS,
         )
@@ -185,8 +210,8 @@ def get_ctrl_func(
             circ.qubits[:1],
         )
         if pft_rz:
-            steane.add_iceberg_w0(circ, 0)
-            steane.add_iceberg_w1(circ, 0)
+            circ.add_custom_gate(iceberg_w_0_detect, [], [0])
+            circ.add_custom_gate(iceberg_w_1_detect, [], [0])
         return circ
 
     return get_ctrlu
@@ -219,6 +244,6 @@ def get_state(
             )
         if pft_rz:
             # Iceberg-style error detection.
-            steane.add_iceberg_w0(state, 0)
-            steane.add_iceberg_w1(state, 0)
+            state.add_custom_gate(iceberg_w_0_detect, [], [0])
+            state.add_custom_gate(iceberg_w_1_detect, [], [0])
     return state

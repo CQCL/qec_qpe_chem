@@ -11,8 +11,8 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     install_requires=[
-        "pytket==1.38.0",
-        "pytket-quantinuum[pecos]==0.42.0",
+        "pytket>=2.0.0",
+        "pytket-quantinuum[pecos]>=0.47.0",
     ],
     classifiers=[
         "Environment :: Console",
