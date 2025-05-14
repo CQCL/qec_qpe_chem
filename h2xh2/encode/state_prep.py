@@ -59,6 +59,7 @@ def get_non_ft_rz_plus_prep(phase: float, data_qubits: List[Qubit]) -> Circuit:
     non_ft_rz_plus_prep_circ.CX(data_qubits[3], data_qubits[2])
     for q in data_qubits:
         non_ft_rz_plus_prep_circ.H(q)
+    return non_ft_rz_plus_prep_circ
 
 
 def get_ft_prep(data_qubits: List[Qubit], goto_qubit: Qubit, goto_bit: Bit) -> Circuit:
