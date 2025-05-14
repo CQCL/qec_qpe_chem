@@ -37,7 +37,6 @@ LSDATA = [
     ("no_qec_emulator", Property("green", "NoQEC (emulator)")),
     ("exp_emulator", Property("red", "Exp (emulator)")),
     ("exp_hardware", Property("black", "Exp (hardware)")),
-    ("phys_hardware", Property("darkblue", "Phys (hardware)")),
 ]
 
 
