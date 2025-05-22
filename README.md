@@ -12,7 +12,7 @@ It provides automatic tooling for running experiments on Quantinuum hardware usi
 
 ## Disclaimer
 
-We **stress** that the python tools available in this repository were written for the H2 on Quantinuum hardware experiment *add citation as appropriate*. We do not consider this code to be a prototype for running such experiments in the future. We are happy for code in this repository to be used in other work, but we do not guarantee that the code will work appropriately and any requires fixed will likely need to be made independently. While there are example notebooks and tests, API documentations and manuals are not provided.
+We **stress** that the python tools available in this repository were written for the H2 on Quantinuum hardware experiment. We do not consider this code to be a prototype for running such experiments in the future. We are happy for code in this repository to be used in other work, but we do not guarantee that the code will work appropriately and any requires fixed will likely need to be made independently. While there are example notebooks and tests, API documentations and manuals are not provided.
 
 ## Installation
 
